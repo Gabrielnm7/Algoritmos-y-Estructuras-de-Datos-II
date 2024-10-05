@@ -19,7 +19,7 @@ class MainTests {
         assertEquals(8, main.fibonacci(6));
         assertEquals(13, main.fibonacci(7));
     }
-
+    
     @Test
     void fibRetTests() {
         assertEquals(0, main.fibonacciReturn(0));
