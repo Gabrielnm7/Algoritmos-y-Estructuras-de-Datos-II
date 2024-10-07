@@ -8,6 +8,8 @@ class Main {
             res = 0;
         } else if (n == 1) {
             res = 1;
+        // Se podria hacer if ( (n==0) || (n==1) ){
+        // res = n; }
         } else {
             res = fibonacci(n - 1) + fibonacci(n - 2);
         }
