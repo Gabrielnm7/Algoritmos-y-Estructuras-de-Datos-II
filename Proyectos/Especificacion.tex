@@ -1,0 +1,439 @@
+\documentclass[10pt,a4paper]{article}
+
+\input{AEDmacros}
+\usepackage{hyperref}
+\usepackage{caratula} % Version modificada para usar las macros de algo1 de ~> https://github.com/bcardiff/dc-tex
+
+
+\titulo{Especificación y WP}
+% \subtitulo{Subtítulo del tp}
+
+\fecha{\today}
+
+\materia{Algoritmo y Estructura de datos II}
+\grupo{Grupo Gaussianos}
+
+\integrante{Nuñez Moreno, Gabriel}{55/21}{gabrielnm07@gmail.com}
+\integrante{Nakasone, Julián}{1074/22}{julunaka@gmail.com}
+\integrante{Pacheco Parrondo, Gerónimo Gabriel}{811/23}{pachecogero16@gmail.com}
+\integrante{Cuestas, Martín}{466/24}{martincuestas51@gmail.com}
+% Pongan cuantos integrantes quieran
+
+% Declaramos donde van a estar las figuras
+% No es obligatorio, pero suele ser comodo
+\graphicspath{{../static/}}
+
+\begin{document}
+
+\maketitle
+
+\section{Definición de Tipos}
+\begin{description}
+	\item type ciudad = Char $\times$ \ent \hspace{1cm}
+	\item type ciudades = \TLista{Ciudad}
+\end{description}
+
+Donde leemos a ciudad como $<nombre, habitantes>$
+
+\section{Especificación de consignas}
+
+\subsection{Ejercicio 1: grandesCiudades}
+\begin{proc}{grandesCiudades}{\In ciudades : \TLista{Ciudad}}{\TLista{Ciudad}}
+	%    \modifica{parametro1, parametro2,..}
+	\requiere{sinRepetidosCiudades(ciudades)}
+        \vspace{0.1cm}
+        \requiere {habitantesValidos(ciudades)}
+        \vspace{0.1cm}
+	% \asegura{|res| \leq |ciudades|}
+        \asegura{enCiudades(res,ciudades) \land grandesEn(res,ciudades) \land sinRepetidosCiudades(res)}
+\end{proc}
+
+\vspace{0.5cm}
+
+\pred{habitantesValidos}{ciudades: \TLista{Ciudad}}
+{\paraTodo[unalinea]{i}{\ent}{0\leq i < |ciudades|} \implicaLuego (ciudad[i].habitantes \geq 0)}
+
+\pred{enCiudades}{res: \TLista{Ciudad}, ciudades: \TLista{ciudad}}
+{\paraTodo[unalinea]{i}{\ent}{0\leq i < |res|) \implicaLuego (res[i] \in ciudades) \land (res[i].habitantes > $ 50.000$)}}
+
+\pred{grandesEn}{res: \TLista{Ciudad}, ciudades: \TLista{Ciudad}}
+{\paraTodo[unalinea]{i}{\ent}{(0 \leq i < |ciudades| \yLuego (ciudades[i].habitantes > $ 50.000$)) \implicaLuego ciudades[i] \in res}}
+
+\pred{sinRepetidosCiudades}{c: \TLista{Ciudad}}
+{\paraTodo[unalinea]{i}{\ent}{0 \leq i < |c| \implicaLuego \neg \existe[unalinea]{j}{\ent}{0 \leq j < |c| \land i \neq j \yLuego c[i].nombre = c[j].nombre}}}
+
+\subsection{Ejercicio 2: sumaDeHabitantes}
+
+\begin{proc}{sumaDeHabitantes}{\In menoresDeCiudades: \TLista{Ciudad}, \In mayoresDeCiudades : \TLista{Ciudad}}{\TLista{Ciudad}}
+
+\requiere{\vert menoresDeCiudades \vert = \vert mayoresDeCiudades \vert}
+\vspace{0.1cm}
+\requiere {habitantesValidos(menoresDeCiudades) \land  habitantesValidos(mayoresDeCiudades)}
+\vspace{0.1cm}
+\requiere{sinRepetidosCiudades(mayoresDeCiudades) \land sinRepetidosCiudades(menoresDeCiudades)}
+\vspace{0.1cm}
+\requiere{mismasCiudades(menoresDeCiudades,mayoresDeCiudades}
+\vspace{0.1cm}
+\asegura{|res| = \vert mayoresDeCiudades \vert}
+\vspace{0.1cm}
+\asegura{mismasCiudades(res,mayoresDeCiudades) \land mismasCiudades(mayoresDeCiudades,res)}
+\vspace{0.1cm}
+\asegura{sonSumadeAmbas(res,menoresDeCiudades,mayoresDeCiudades) \land sinRepetidosCiudades(res)}
+    
+\end{proc}
+
+\pred{mismasCiudades}{r: \TLista{Ciudad}, c: \TLista{Ciudad}}
+{\paraTodo[unalinea]{i}{\ent}{0 \leq i < |r| \implicaLuego \existe[unalinea]{j}{\ent}{0 \leq j < |c| \yLuego (r[i].nombre = c[j].nombre)}}}
+
+\pred{sonSumadeAmbas}{r: \TLista{Ciudad}, menores: \TLista{Ciudad}, mayores: \TLista{Ciudad}}
+{\paraTodo[unalinea]{i}{\ent}{0 \leq i < |r| \implicaLuego \existe[unalinea]{j,k}{\ent}{0 \leq j < |menores| \land 0 \leq k < |mayores| \yLuego (r[i].nombre = menores[j].nombre = mayores[k].nombre) \land (r[i].habitantes = menores[j].habitantes + mayores[k].habitantes)}}}
+
+\subsection{Ejercicio 3: hayCamino}
+\begin{proc}{hayCamino}{\In distancias: \TLista{\TLista {\ent}}, \In desde: \ent, \In hasta: \ent} {bool}
+\requiere {matrizValida(distancias) \yLuego enRango(desde,distancias) \land enRango(hasta,distancias)}
+\asegura {res=True \iff \existe[unalinea]{s}{\TLista{\ent}}{|s| \geq 2 \yLuego (s[0] = desde) \land (s[|s-1|] = hasta) \land (allConnected(s, distancias)}}
+\end{proc}
+
+\pred{matrizValida}{M: \TLista{\TLista {\ent}} }{esCuadrada(M)\yLuego esSimetrica(M) \land sinNegativos(M) \land diagonalConCeros(M)}
+
+\pred{esCuadrada}{M: \TLista{\TLista {\ent}} }{\paraTodo[unalinea]{i}{\ent}{0 \leq i < |M| \implicaLuego |M[i]| = |M|}}
+\newpage
+\pred{esSimetrica}{M: \TLista{\TLista {\ent}} }{\paraTodo[unalinea]{i}{\ent}{0 \leq i < |M| \implicaLuego {\paraTodo[unalinea]{j}{\ent}{0 \leq j < |M| \implicaLuego M[i][j] = M[j][i] }}}}
+
+\pred{sinNegativos}{M: \TLista{\TLista {\ent}} }{\paraTodo[unalinea]{i}{\ent}{0 \leq i < |M| \implicaLuego todosPositivos(M[i])}}
+
+\pred{todosPositivos}{fila: \TLista {\ent} }{\paraTodo[unalinea]{i}{\ent}{0 \leq i < |fila| \implicaLuego fila[i] \geq 0 }}
+
+\pred{allConnected}{s: \TLista {\ent} ,M: \TLista{\TLista {\ent}} }{\paraTodo[unalinea]{i}{\ent}{0 \leq i < |s| - 1 \implicaLuego hayCaminoDirecto(s[i],s[i+1],M)}}
+
+
+\pred{diagonalConCeros}{M: \TLista{\TLista {\ent}} }{\paraTodo[unalinea]{i}{\ent}{0 \leq i < |M| \implicaLuego {\paraTodo[unalinea]{j}{\ent}{0 \leq j < |M[i]| \land (i=j) \implicaLuego M[i][j] = 0 }}}}
+
+
+\pred{hayCaminoDirecto}{desde: \ent, hasta: \ent, M: \TLista{\TLista {\ent}} }{M[desde][hasta]>0}
+
+
+\pred {enRango}{x:\ent, M:\TLista{\TLista {\ent}}}{0 \leq x \leq |M|-1}
+
+\subsection{Ejercicio 4: cantidadCaminoNSaltos}
+Para este ejercicio definimos lo siguiente para hacer mas clara la lectura:
+
+- type matriz = \TLista{\TLista{\ent}}
+\vspace{0.3cm}
+\begin{proc}{cantidadCaminoNSaltos}{\Inout conexion: \matriz{\ent}, \In n: \ent}{}
+\requiere {esDeConexion(conexion) \land conexion = C_{0} \land n \geq 1}
+\asegura {\existe[unalinea]{L}{\TLista{matriz}}{|L| = n \yLuego L[0] = C_{0} \land L[|L|-1] = conexion \land \paraTodo[unalinea]{i}{\ent}{1 \leq i < |L| \implicaLuego esProductoMatricial(L[i],L[i-1],L[0])}}}
+\end{proc}
+
+\pred{esDeConexion}{M: matriz}{esCuadrada(M) \yLuego esSimetrica(M) \land  diagonalConCeros(M) \land UnosyCeros(M)}
+
+\pred{UnosyCeros}{M: matriz}{(\forall {i}:\ent) \paraTodo[unalinea]{j}{\ent}{0 \leq i < |M| \land 0 \leq j < |M| \implicaLuego (M[i][j] = 0) \lor (M[i][j] = 1)}}
+
+\pred{esProductoMatricial}{R: matriz, $M_1$: matriz, $M_2$: matriz}{
+(\forall i: \ent)\paraTodo[unalinea]{j}{\ent}{0 \leq i < |M_{1}| \land 0 \leq j < |M_{2}| \implicaLuego R[i][j] = \sum\limits_{k=0}^{|R| - 1} M_{1}[i][k] * M_{2}[k][j]}}
+
+\subsection{Ejercicio 5: caminoMinimo}
+\begin{proc}{caminoMinimo}{\In origen: \ent, \In destino: \ent, \In distancias: \matriz{\ent}}{\matriz{\ent}}
+
+\requiere {matrizValida(distancias) \yLuego enRango(origen, distancias) \land enRango(destino,distancias)}
+
+\asegura {(|res| = 0 \land \neg \existe[unalinea]{s}{\TLista{\ent}}{esCaminoMinimo(s,origen,destino,distancias)) \lor \\ (esCaminoMinimo(res,origen,destino,distancias)}}s
+\end{proc}
+
+\pred{esCaminoMinimo}{s: \TLista{\ent}, origen: \ent, destino: \ent, distancias: \TLista{\TLista{\ent}}}{|s| \geq 2 \yLuego (s[0]= origen) \land (s[|s|-1]=destino)  \land \\ 
+allConnected(s,distancias) \land masOptimo(s, origen, destino, distancias))}
+
+\pred{masOptimo}{s: \TLista{\ent}, origen: \ent, destino: \ent, distancias: \matriz{\ent}}
+{\neg \existe[unalinea]{l}{\TLista{\ent}}{|l| \geq 2 \yLuego (l[0]=origen) \land (l[|l-1]=destino) \land allConnected(l,distancias) \land \\ distanciasTotal(l,distancias) < distanciaTotal(s,distancias) }}
+
+\aux{distanciaTotal}{s: \TLista{\ent}, M: \TLista{\ent}}{\ent}{
+	\sum\limits_{i=0}^{|s|-2} distancia(s[i],s[i+1],M)
+}
+\vspace{0.2cm}
+\aux{distancia}{d: \ent, h: \ent, M: \TLista{\ent}}{\ent}{M[d][h]}
+\newpage
+\section{Demostraciones de correctitud}
+
+\subsection{Ejercicio 2.1}
+Tenemos la siguiente especificacion: \\
+\begin{proc}{poblacionTotal}{in ciudades: \TLista{Ciudad}}{\ent}
+
+\requiere{\existe[unalinea]{i}{\ent}{0 \leq i < |ciudades| \yLuego ciudades[i].habitantes > 50000} \land \\
+\paraTodo[unalinea]{i}{\ent}{0 \leq i < |ciudades| \implicaLuego ciudades[i].habitantes \geq 0} 
+\land \\
+\paraTodo[unalinea]{i}{\ent}{\paraTodo[unalinea]{j}{\ent}{0 \leq i < j < |ciudades| \implicaLuego ciudades[i].nombre \neq ciudades[j].nombre}}}
+\vspace{0.2cm}
+\asegura{ res = \sum\limits_{i=0}^{|ciudades|-1} ciudades[i].habitantes}
+    
+\end{proc}
+Y su implementacion:\\
+
+%\begin{minipage}[t]{\textwidth}
+	\begin{lstlisting}[caption={Implementacion de la especificacion en SmallLang},label=code:for]
+res := 0;
+i := 0;
+while (i < ciudades.length) do
+	res := res + ciudades[i].habitantes;
+	i := i + 1
+endwhile
+	\end{lstlisting}
+%\end{minipage}
+
+Para demostrar que la implementación es correcta con respecto a la especificación debemos demostrar los 3 puntos del teorema del invariante y los 2 puntos del teorema de terminación de ciclo, que son:
+\vspace{0.2cm}
+\begin{enumerate}\setlength\itemsep{0cm}
+    \item $P_C \Rightarrow I$
+    \item $\{I \wedge B\} S\{I\}$,
+    \item $I \wedge \neg B \Rightarrow Q_C$,
+    \item $\left\{I \wedge B \wedge v_0=f v\right\} \mathbf{S}\left\{f v<v_0\right\}$, y
+    \item $I \wedge f v \leq 0 \Rightarrow \neg B$
+\end{enumerate}
+
+Primero, definimos nuestra Precondicion del Ciclo ($P_C$), la guarda (B), la Postcondicion del Ciclo ($Q_C$), nuestra propuesta de invariante (I) y la funcion variante ($f_v$):
+
+\begin{itemize}\setlength\itemsep{0.2cm}
+    \item $P_C \equiv res=0 \land i=0$ \label{PC}
+    \item $B \equiv i < ciudades.length$
+    \item $Q_C \equiv res=  \sum\limits_{i=0}^{|ciudades|-1} ciudades[i].habitantes$ \label{QC}
+    \item $I \equiv 0 \leq i \leq |ciudades| \yLuego res = \sum\limits_{j=0}^{i-1} ciudades[j].habitantes$ \label{invariante}
+    \item $f_v = |ciudades| - i$ \label{fv}
+ \vspace{0.2cm}
+    Notemos tambien que:
+    \item $S_1 \equiv res := res + ciudades[i].habitantes$ \label{S1}
+    \item $S_2 \equiv i := i + 1$ \label{S2}
+
+\end{itemize}
+
+Aclaraciones previas: 
+
+- Tomamos las definiciones de variables con el valor de True, para hacer más clara la lectura.
+
+- En casos donde las definiciones tengan influencia sobre el desarrollo, estarán incluidas. 
+
+\newpage
+
+Empezamos con el $1.\ \ P_C \implica I$ \\
+
+$i = 0 \land res = 0  \implica 0 \leq i \leq |ciudades| \yLuego res = \sum\limits_{j=0}^{i-1} ciudades[j].habitantes$ \\
+
+$i = 0 \land res = 0 \implica 0 \leq |ciudades| \land 0 = \sum\limits_{j=0}^{-1} ciudades[j].habitantes$ \\
+
+$i = 0 \land res = 0 \implica True \land (0 = 0)$ \\
+
+$i = 0 \land res = 0 \implica True \land True$ \\
+
+$\equiv True \ \ \checkmark$
+
+\vspace{0.3cm}
+
+Seguimos con el $2. \left\{I \wedge B \right\} \mathbf{S}\left\{I\right\}$ \\
+
+\vspace{0.3cm}
+
+$WP(S,I) \equiv WP(S_1; S_2, I)$ esto vale por el axioma 3 \\
+
+\vspace{0.1cm}
+
+WP$(res:= res + ciudades[i].habitantes, WP_1(i:=i+1, 0 \leq i \leq |ciudades| \land res = \sum\limits_{j=0}^{i-1} ciudades[j].habitantes ) \equiv$ \\
+
+Primero vemos $WP_{1}$: \\
+
+Por axioma 1: $WP_1 \equiv  (0 \leq i+1 \leq |ciudades| \yLuego res = \sum\limits_{j=0}^{i} ciudades[j].habitantes) \equiv $ \\
+
+
+$\equiv (-1 \leq i < |ciudades| \yLuego res = \sum\limits_{j=0}^{i} ciudades[j].habitantes)$\\
+
+Ahora seguimos con la $WP$ original: \\
+
+$WP(res: = res + ciudades[i].habitantes, -1 \leq i < |ciudades| \yLuego res = \sum\limits_{j=0}^{i} ciudades[j].habitantes)$ \\
+
+Por axioma 1: \\
+
+$(-1 \leq i < |ciudades| \yLuego res + ciudades[i].habitantes = \sum\limits_{j=0}^{i} ciudades[j].habitantes) \equiv $ \\
+
+$\equiv (-1 \leq i < |ciudades| \yLuego res = \sum\limits_{j=0}^{i} ciudades[j].habitantes - ciudades[i].habitantes) \equiv $ \\
+
+$\equiv (-1 \leq i < |ciudades| \yLuego res = \sum\limits_{j=0}^{i-1} ciudades[j].habitantes)$ \\
+
+Luego, compruebo que $\left\{I \wedge B\right\} \implica WP$\\
+
+$0 \leq i < |ciudades| \yLuego res = \sum\limits_{j=0}^{i-1} ciudades[j].habitantes \implica (-1 \leq i < |ciudades| \yLuego res = \sum\limits_{j=0}^{i-1} ciudades[j].habitantes)$ \\
+
+$\equiv True \ \ \checkmark$
+
+\vspace{0.3cm}
+Continuamos con el 3. $I \land \neg B \implica Q_c$ \\
+\vspace{0.2cm}
+
+$0 \leq i \leq |ciudades| \yLuego res = \sum\limits_{j=0}^{i-1} ciudades[j].habitantes \land \neg (i < ciudades.length) \equiv$ \\
+\vspace{0.2cm}
+
+$\equiv i = |ciudades| \land res = \sum\limits_{j=0}^{|ciudades|-1} ciudades[j].habitantes$ \\
+\vspace{0.2cm}
+
+Entonces como: $res = \sum\limits_{j=0}^{|ciudades|-1} ciudades[j].habitantes \implica Q_C \equiv res = \sum\limits_{j=0}^{|ciudades|-1} ciudades[j].habitantes \\
+\vspace{0.2cm}
+
+Luego: $i = |ciudades| \land res = \sum\limits_{j=0}^{|ciudades|-1} ciudades[j].habitantes \implica Q_C \ \ \checkmark$\\
+
+\vspace{0.3cm}
+\newpage
+Hasta este punto ya hemos probado la correctitud parcial del ciclo, ahora probaremos que el ciclo finaliza. \\
+\vspace{0.2cm}
+
+$4. \left\{I \wedge B \wedge v_0=f v\right\} \mathbf{S}\left\{f v<v_0\right\}$ \\
+\vspace{0.2cm}
+
+WP(S,$f_v < v_0$) \equiv WP($S_1$; $S_2$, $f_v < v_0$) por axioma 3 \\
+
+\vspace{0.2cm}
+
+$WP(res:= res + ciudades[i].habitantes, WP_1(i:= i+1, (|ciudades| < i) < v_0)) $ \\
+
+WP$_1$$(i:= i+1, (|ciudades| < i) < v_0) \equiv (|ciudades| - i - 1) < v_0$ por axioma 1 \\
+
+\vspace{0.2cm}
+
+WP$(res:= res + ciudades[i].habitantes , (|ciudades| - i - 1) < v_0 )$ \equiv \\
+
+\vspace{0.2cm}
+
+\equiv $ (0 \leq i < |ciudades| \land |ciudades| - i - 1 <  v_0$ \equiv $WP$ \\
+
+\vspace{0.2cm}
+
+Veamos que $\left\{I \wedge B \wedge v_0=f v\right\} \implica $ WP \\
+
+\vspace{0.2cm}
+
+$(I \land B \land v_0 =f_v) \equiv 0 \leq i \leq |ciudades| \land res = \sum\limits_{j=0}^{i-1} ciudades[j].habitantes \land i < |ciudades| \land (|ciudades| - i = v_o) \equiv $ \\
+
+\vspace{0.2cm}
+
+Al ser $res = \sum\limits_{j=0}^{i-1} ciudades[j].habitantes$ irrelevante para la demostración, lo daremos por hecho (i.e no estará presente) \\ 
+
+\vspace{0.2cm}
+
+\equiv $\ \ 0 \leq i < |ciudades| \land (|ciudades| - i = v_0) \implica (0 \leq i < |ciudades|) \land (|ciudades| - i - 1 < v_0)$ \\
+
+
+\vspace{0.2cm}
+
+$a.\ \ 0 \leq i < |ciudades| \implica 0 \leq i < |ciudades|$\ \ \checkmark \\
+
+$b. \ \ |ciudades| - i = v_0 \implica |ciudades| - i - 1 < |ciudades| - i$ \equiv \\
+
+\equiv $\ \ \vert ciudades| - i = v_0 \implica True$ \equiv \\
+
+\equiv \ \ True \ \ \checkmark \\
+
+Entonces $\ \ (0 \leq i < |ciudades|) \land (|ciudades| - i = v_0) \implica (0 \leq i < |ciudades|) \land (|ciudades| - i - 1 < v_0)$ \ \ \checkmark \\
+
+
+
+\vspace{0.3cm}
+$5.\ \ I \wedge f_v \leq 0 \implica \neg B$ \\
+\vspace{0.2cm}
+
+Al igual que en el 4. $res = \sum\limits_{j=0}^{i-1} ciudades[j].habitantes$ es irrelevante para la demostración. \\ 
+
+
+$\equiv 0 \leq i \leq |ciudades| \land (|ciudades|-i \leq 0) \implica i \geq |ciudades|$ \\
+
+$\equiv 0 \leq i \leq |ciudades| \land (|ciudades| \leq i) \implica i \geq |ciudades|$ \\
+
+$\equiv i = |ciudades| \implica i \geq |ciudades|$\\
+
+$\equiv True$ \checkmark \\
+
+Finalmente, hemos probado la correctitud del ciclo, y la finalizacion del mismo. Por lo tanto, solo resta probar la correctitud del programa respeto a la especificación. Para ello estudiaremos la siguiente tripla de Hoare: $
+\left\{\text{Requiere}\right\} \mathbf{S} \left\{P_C\right\}$ \\
+
+Recordemos el requiere, S y la $P_C$ \hyperref[PC]{aqui} \\ 
+
+Buscamos la WP(S1;S2,$P_C$) \equiv $WP(S1, WP_1(S2, Pc) \equiv WP(res: = 0, WP_1(i= 0, res = 0 \land i = 0))$\\
+
+Por axioma 1: $WP(res: = 0, res = 0 \land \ \ 0 = 0) \equiv \ \ 0 = 0 \land \ \ 0 = 0 \equiv\ \ True$ \\
+
+Luego, como $(WP \equiv True)$, tenemos que $(requiere \implica True)$ es una tautología.
+De esta forma probamos que el programa es correcto respecto a la especificación dada.
+
+
+\subsection{Ejercicio 2.2}\\
+
+Para probar que con la finalización del programa el valor de habitantes devuelto es mayor a 50.000, utilizo un nuevo $Q_C$ y para realizar nuevamente las demostraciones con este nuevo $Q_C$, utilizo un nuevo Invariante, y una nueva $P_C$ \\
+\begin{itemize}
+    \item $Q_C \equiv res > $ 50.000 $ \land \ \ res = \sum\limits_{i=0}^{|ciudades|-1} ciudades[i].habitantes $
+    \item I $\equiv \ \ 0 \leq i \leq |ciudades| \yLuego res = \sum\limits_{j=0}^{i-1} ciudades[j].habitantes \land \sum\limits_{j=0}^{|ciudades| -1} ciudades[j].habitantes > $ 50.000
+    \item $P_C \equiv  i = 0 \ \ \land res = 0 \land \existe[unalinea]{i}{\ent}{0 \leq i < |ciudades| \yLuego ciudades[i].habitantes > $50.000$}$ \land \\ \paraTodo[unalinea]{i}{\ent}{0 \leq i < |ciudades| \implicaLuego ciudades[i].habitantes \geq 0}$ \\
+
+\end{itemize}
+
+Ahora, explicaremos como cambia cada punto de la demostración de correctitud parcial con este nuevo invariante. \\
+
+$P_C \implica I:$ \\
+
+$i = 0 \land res = 0 \land \existe[unalinea]{i}{\ent}{0 \leq i < |ciudades| \yLuego ciudades[i].habitantes > 50000} \land \\ \paraTodo[unalinea]{i}{\ent}{0 \leq i < |ciudades| \implicaLuego ciudades[i].habitantes \geq 0}\implica 0 \leq |ciudades| \land 0 = \sum\limits_{j=0}^{-1} ciudades[i].habitantes \land \sum\limits_{j=0}^{|ciudades| -1} ciudades[j].habitantes > 50000$ \\
+
+$i = 0 \land res = 0 \land \existe[unalinea]{i}{\ent}{0 \leq i < |ciudades| \yLuego ciudades[i].habitantes > 50000} \land \\ \paraTodo[unalinea]{i}{\ent}{0 \leq i < |ciudades| \implicaLuego ciudades[i].habitantes \geq 0}\implica True \land (0 = 0)\land \sum\limits_{j=0}^{|ciudades| -1} ciudades[j].habitantes > 50000$ \\
+
+$i = 0 \land res = 0 \land \existe[unalinea]{i}{\ent}{0 \leq i < |ciudades| \yLuego ciudades[i].habitantes > 50000} \land \\ \paraTodo[unalinea]{i}{\ent}{0 \leq i < |ciudades| \implicaLuego ciudades[i].habitantes \geq 0}\implica True \land True\land \sum\limits_{j=0}^{|ciudades| -1} ciudades[j].habitantes > 50000$ \\
+
+$\equiv True \checkmark$ \\
+
+En este caso, la demostración es equivalente a la dada anteriormente, excepto que el agregado al nuevo invariante se prueba con lo agregado al nuevo $P_C$ que pertenece al requiere de la especificación, ya que este último nos asegura de que existirá al menos una ciudad en ciudades que cuente con más de 50000 habitantes (cifra que sera sumada al total), y además, no pueden existir habitantes negativos, por lo que en el transcurso de la sumatoria el total jamás disminuirá. \\
+
+Veamos ahora: $\{I \wedge B\}\ \ S \ \ \{I\}:$\\
+
+$WP(S,I) \equiv WP(S_1; S_2, I)$ \\
+
+Por axioma 3 \\
+
+\vspace{0.1cm}
+
+WP$(S_1, WP_1(S_2, 0 \leq i \leq |ciudades| \yLuego res = \sum\limits_{j=0}^{i-1} ciudades[j].habitantes \land \sum\limits_{j=0}^{|ciudades| -1} ciudades[j].habitantes > 50000)$ \\
+
+Por axioma 1: \\
+
+$WP_1(0 \leq i+1 \leq |ciudades| \yLuego res = \sum\limits_{j=0}^{i} ciudades[i].habitantes) \land \sum\limits_{j=0}^{|ciudades| -1} ciudades[j].habitantes > 50000) \equiv $ \\
+
+
+$\equiv (-1 \leq i < |ciudades| \yLuego res = \sum\limits_{j=0}^{i} ciudades[i].habitantes) \land \sum\limits_{j=0}^{|ciudades| -1} ciudades[j].habitantes > 50000)$\\
+
+Ahora seguimos con la $WP$ original: \\
+
+$WP(S_1, -1 \leq i < |ciudades| \yLuego res = \sum\limits_{j=0}^{i} ciudades[j].habitantes) \land \sum\limits_{j=0}^{|ciudades| -1} ciudades[j].habitantes > 50000)$ \\
+
+Por axioma 1: \\
+
+$(-1 \leq i < |ciudades| \yLuego res + ciudades[i].habitantes = \sum\limits_{j=0}^{i} ciudades[j].habitantes) \land \sum\limits_{j=0}^{|ciudades| -1} ciudades[j].habitantes > 50000) \equiv $ \\
+
+$\equiv (-1 \leq i < |ciudades| \yLuego res = \sum\limits_{j=0}^{i-1} ciudades[j].habitantes) \land \sum\limits_{j=0}^{|ciudades| -1} ciudades[j].habitantes > 50000)$ \\
+
+Luego, como $\left\{I \wedge B\right\} \implica WP$ es equivalente a la demostracion hecha con anterioridad, sigue valiendo.\\
+
+Sigamos con: $I \wedge \neg B \Rightarrow Q_C$\\
+
+$i = |ciudades| \yLuego res = \sum\limits_{j=0}^{i-1} ciudades[j].habitantes \land \sum\limits_{j=0}^{|ciudades| -1} ciudades[j].habitantes > 50000 \implica Q_C$ \\
+
+Como $Q_C \equiv res > 50000 \land res = \sum\limits_{i=0}^{|ciudades|-1} ciudades[i].habitantes $
+
+Tenemos que: 
+$i = |ciudades| \yLuego res = \sum\limits_{j=0}^{i-1} ciudades[j].habitantes \land \sum\limits_{j=0}^{|ciudades| -1} ciudades[j].habitantes > 50000 \implica  res = \sum\limits_{j=0}^{|ciudades|-1} ciudades[j].habitantes \land \sum\limits_{j=0}^{|ciudades| -1} ciudades[j].habitantes > 50000$ \\
+
+Es decir: 
+$res = \sum\limits_{j=0}^{|ciudades|-1} ciudades[j].habitantes \land res > 50000 \equiv Q_C$ \\
+
+$Q_c \implica Q_c$ \equiv True\\
+
+
+Pasando a la demostración de finalización, para asegurar que el ciclo efectivamente terminara en una serie finita de pasos, bien sabemos que en los dos desarrollos dados anteriormente, ($ res = \sum\limits_{j=0}^{i-1} ciudades[j].habitantes $) es redundante, ya que no influye de ninguna forma. Con el nuevo invariante dado, se puede afirmar que el nuevo agregado: \\ 
+
+$\sum\limits_{j=0}^{|ciudades|-1} ciudades[j].habitantes > $50.000$ $ tampoco tendrá ninguna influencia en los desarrollos, por lo que la demostración se dará exactamente de la misma forma, y seguirá siendo valida, por lo que el ciclo terminará. \\
+
+A su vez, en cuanto a la demostración de correctitud de la implementación sobre la especificación, el único cambio se encuentra en $P_C$, y este al buscar la WP para probar la tripla de Hoare (\[
+\left\{\text{Requiere}\right\} \mathbf{S} \left\{P_C\right\}
+\]) no es modificado por S, por lo tanto quedara la misma expresión en la WP encontrada. Dicha expresion se encuentra en el requiere, y cuando realizamos la implicacion (Requiere \implica WP) para ver si la tripla de Hoare es correcta, sera True.
+
+\end{document}
+
