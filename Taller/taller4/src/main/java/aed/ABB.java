@@ -163,18 +163,61 @@ public class ABB<T extends Comparable<T>> implements Conjunto<T> {
     }
 
     public String toString(){
-        throw new UnsupportedOperationException("No implementada aun");
+        String msg = "{";
+        Nodo actual = nodoMinimo();
+        while (actual != null){
+            if (actual.valor == minimo()){
+                msg += actual.valor;
+            } else {
+                msg += "," + actual.valor;
+            }
+            actual = sucesor(actual);
+        }
+        return msg + "}";
     }
 
+    // Devuelve el nodo con el valor mínimo en el árbol
+    private Nodo nodoMinimo() {
+        Nodo actual = this._raiz;
+        while (actual != null && actual.izq != null) {
+            actual = actual.izq;
+        }
+        return actual;
+    }
+
+    // Sacado de la clase
+    private Nodo sucesor(Nodo nodo){
+        // caso tiene subarbol derecho
+        Nodo res;
+        if (nodo.der != null){
+            res = nodo.der;
+            while (res.izq != null){
+                res = res.izq;
+            }
+        } else {
+            // caso contrario: no tiene subarbol derecho
+            // en ese caso trepo en el arbol en tanto no encuentre un hijo izq -> CONSULTAR ESTO
+            res = nodo.padre;
+            while (res!=null && nodo == res.der){
+                nodo = res;
+                res = res.padre;
+            }
+        }
+        return res;
+    }
+
+
     private class ABB_Iterador implements Iterador<T> {
-        private Nodo _actual = minimo(); // Necesito que minimo devuelva el nodo minimo, no el valor minimo
+        private Nodo _actual = nodoMinimo();
 
         public boolean haySiguiente() {            
-            throw new UnsupportedOperationException("No implementada aun");
+            return _actual != null;
         }
-    
+        // Devuelve el valor del nodo actual y avanza al siguiente
         public T siguiente() {
-            throw new UnsupportedOperationException("No implementada aun");
+            T valor = _actual.valor;
+            _actual = sucesor(_actual);
+            return valor;
         }
     }
 

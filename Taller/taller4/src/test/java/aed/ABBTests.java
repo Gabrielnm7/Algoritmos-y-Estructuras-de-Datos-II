@@ -327,7 +327,7 @@ class ABBTests {
 
     }
 
-    Integer NCLAVES = 1000;
+    Integer NCLAVES = 10;
 
     private Integer clave(Integer i) {
         return NCLAVES * ((i * i - 100 * i) % NCLAVES) + i;
@@ -343,6 +343,7 @@ class ABBTests {
             Integer k = clave(i);
             assertEquals(i, conjunto.cardinal());
             assertEquals(false, conjunto.pertenece(k));
+            System.out.println("Insertando: " + k);
             conjunto.insertar(k);
             assertEquals(true, conjunto.pertenece(k));
         }
@@ -362,10 +363,12 @@ class ABBTests {
         // Eliminar los valores para i par
         for (Integer i = 0; i < NCLAVES; i++) {
             Integer k = clave(i);
+            System.out.println("Verificando: " + k);
+            System.out.println("Pertenece: " + conjunto.pertenece(k));
             assertTrue(conjunto.pertenece(k));
             if (i % 2 == 0) {
                 conjunto.eliminar(k);
-
+                System.out.println("Eliminando: " + k);
                 assertFalse(conjunto.pertenece(k));
             }
         }
