@@ -146,17 +146,26 @@ public class ABB<T extends Comparable<T>> implements Conjunto<T> {
                     // Eliminamos el minimo, tengo 2 casos: si tiene hijo o no
                     // Si tiene hijo, lo subo
                     if (minimo.der != null){
-                        minimo.padre.izq = minimo.der;
+                        if (minimo.padre.izq == minimo){
+                            minimo.padre.izq = minimo.der;
+                        } else {
+                            minimo.padre.der = minimo.der;
+                        }
                         minimo.der.padre = minimo.padre;
                     }
                     // Si no tiene hijo, lo elimino
                     else {
-                        minimo.padre.izq = null;
+                        // Si soy el hijo izquierdo de mi padre
+                        if (minimo.padre.izq == minimo){
+                            minimo.padre.izq = null;
+                        } else { // Si soy el hijo derecho de mi padre
+                            minimo.padre.der = null;
+                        }
                     }
                 }
-            // Le resto uno al cardinal
+              
+            // Le resto uno al cardinal y salgo del ciclo
             this._cardinal--;
-            // Salgo del ciclo
             break;
             }
         }
